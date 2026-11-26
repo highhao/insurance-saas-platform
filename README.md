@@ -1,43 +1,70 @@
 # 產險後端 API：車險與旅平險
 
-依實際 Controller 與 Service 整理兩種險種的投保步驟及後端設計；不公開承保、計價等業務規則。
+整理車險與旅平險從資料準備、報價到訂單操作的後端 API，說明兩種險種如何共用平台能力並保留各自流程；不公開承保或計價規則。
 
 ## 投保流程
 
 ### 車險
 
-1. 查詢或填寫車輛資料。
-2. 依投保路徑填寫車況問答，或直接查詢報價。
-3. 查看報價與方案，選擇投保內容。
-4. 建立訂單。
-5. 視需要更新投保日期、車輛、要保人、被保險人或方案資料。
-6. 依訂單狀態送出、簽署或付款，並查詢訂單狀態。
+```mermaid
+flowchart TB
+    A[輸入或查詢車輛資料] --> B[依路徑填答車況或查詢報價]
+    B --> C[查看報價與選擇方案]
+    C --> D[建立投保訂單]
+    D --> E[更新投保與車輛資料]
+    E --> F[送出、簽署或付款]
+    F --> G[查詢訂單狀態]
+```
 
 ### 旅平險
 
-1. 填寫旅遊資料。
-2. 查詢並比較方案，再取得所選方案報價。
-3. 建立訂單。
-4. 視需要更新旅客及訂單資料。
-5. 依訂單狀態送出、簽署或付款，並查詢訂單狀態。
+```mermaid
+flowchart TB
+    A[輸入旅遊資料] --> B[查詢與比較方案]
+    B --> C[取得所選方案報價]
+    C --> D[建立投保訂單]
+    D --> E[更新旅客與訂單資料]
+    E --> F[送出、簽署或付款]
+    F --> G[查詢訂單狀態]
+```
 
-以上依 Controller 提供的 API 功能排序；各項操作是不同端點，實際順序會依險種及訂單狀態調整。ZIP 中未包含前端頁面，這裡呈現的是 API 對應的操作順序，不含前端元件。
+操作順序依 Controller 提供的 API 能力整理；實際端點會依險種與訂單狀態選用。ZIP 未包含前端頁面，因此圖中不呈現 UI 元件或畫面路徑。
 
-## 後端請求流程
+## 架構心智圖
 
-1. **身份驗證：** Spring Security Filter 驗證請求；Controller 取得已驗證的使用者資訊。
-2. **接收資料：** 車險或旅平險 Controller 接收 DIO 與使用者上下文，交給對應的用例 Service。
-3. **執行用例：** Service 繼承 `BaseService`；共用 `request()` 呼叫 `processData()`，並處理共通例外流程。
-4. **協作與存取：** `processData()` 依端點使用 Worker；部分 Service 直接使用 Mapper 或 Repository，並非固定的單一路徑。
-5. **組裝回應：** `generateResult()` 將處理結果包裝成 DTO／`ResponseDto`。
+```mermaid
+mindmap
+  root((產險 API))
+    險種入口
+      CarInsuranceController
+      TravelController
+    共用請求生命週期
+      BaseService request
+      processData
+      generateResult
+    用例協作
+      Worker
+      WebService
+      Mapper 與 Repository
+    API 契約
+      DIO 輸入
+      使用者上下文
+      DTO 與 ResponseDto
+```
+
+## 後端請求如何處理
+
+1. Spring Security Filter 驗證請求；Controller 取得已驗證的使用者資訊。
+2. 車險或旅平險 Controller 接收 DIO，交給對應用例 Service。
+3. Service 繼承 `BaseService`；共用 `request()` 呼叫 `processData()` 並處理共通例外流程。
+4. `processData()` 依端點使用 Worker；部分 Service 直接使用 Mapper 或 Repository。
+5. `generateResult()` 將結果包裝成 DTO／`ResponseDto`。
 
 ## 設計考量
 
-從程式結構推估，這個模組在同一後端支援車險與旅平險兩種 API，同時共用身份驗證、請求生命週期與回應格式；險種差異則留在各自的 Controller、用例 Service 與協作者。
-
-- `CarInsuranceController` 與 `TravelController` 分開承接險種端點，避免將不同輸入與用例依賴塞進單一入口。
-- `BaseService` 收斂共通請求處理；用例 Service 保留各自的 `processData()` 與 `generateResult()` 實作。
-- Worker 與資料存取依用例選用。這保留用例彈性，但各 Service 的資料存取邊界並非完全一致。
+- **按險種分入口：** `CarInsuranceController` 與 `TravelController` 各自承接端點，讓不同輸入與用例依賴留在各自範圍。
+- **共用穩定步驟：** `BaseService` 收斂請求生命週期；具體 Service 保留各自的資料處理與回應組裝。
+- **協作者依用例選用：** Worker、Mapper、Repository 並非固定串接。這保留了用例彈性，但各 Service 的資料存取邊界並非完全一致。
 
 ## 技術
 

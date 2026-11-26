@@ -10,7 +10,7 @@
 
 Controller／DTO → Service → DAO／Repository；Worker 封裝外部整合，Security Filter 與 Base／AOP 處理共用職責。
 
-## 詳細文件
+## 架構與流程
 
 - [系統架構與元件責任](docs/architecture.md)
 - [API 請求流程](docs/workflow.md)
@@ -19,4 +19,4 @@ Controller／DTO → Service → DAO／Repository；Worker 封裝外部整合，
 
 依領域界定 JPA、JDBC 與 MyBatis 的使用範圍，並為外部 Worker 補上契約測試與一致的錯誤映射。
 
-English: Shared API, security, persistence, and integration layers for an insurance SaaS backend.
+**English:** Shared API, security, persistence, and integration layers for an insurance SaaS backend.

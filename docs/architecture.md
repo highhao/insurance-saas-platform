@@ -18,7 +18,7 @@
 | 套件／類別 | 程式中的責任 |
 |---|---|
 | `controller` | REST 入口；接收 request DIO，取得已驗證的使用者上下文，委派對應 Service |
-| `service` | 以用例為單位；繼承 `generic BaseService`，實作 `processData` 與 `generateResult` |
+| `service` | 以用例為單位；繼承 `BaseService`，實作 `processData` 與 `generateResult` |
 | `worker` | 用例協作元件，包含驗證、資料／訂單協調、通知等；部分 Worker 會再呼叫其他元件 |
 | `webservice` | 按外部服務商組織的整合元件及其資料契約 |
 | `dao` | Spring Data Repository、MyBatis Mapper、Entity／DO 等資料存取元件 |
@@ -29,17 +29,17 @@
 ```mermaid
 flowchart TB
     Client[HTTP Client] --> Security[Spring Security / JWT Filter]
-    Security --> Controller[Controller\nDIO + AuthenticatedMember]
-    Controller -->|service.request(member, input)| UseCase[具體用例 Service\nextends generic BaseService]
+    Security --> Controller[Controller<br/>DIO + AuthenticatedMember]
+    Controller -->|service.request(member, input)| UseCase[具體用例 Service<br/>extends BaseService]
     UseCase -->|BaseService 呼叫覆寫方法| Process[processData]
-    Process -->|依用例協調| Workers[Worker 元件\n驗證 / 流程協調 / 通知]
+    Process -->|依用例協調| Workers[Worker 元件<br/>驗證 / 流程協調 / 通知]
     Process -.部分 Service 直接使用.-> DataAccess[Repository / Mapper]
     Workers -.依用例存取.-> DataAccess
     Workers -.需要外部服務時.-> WebService[WebService 整合元件]
     DataAccess --> Models[Entity / DO]
     Models --> DB[(PostgreSQL)]
     Process -->|輸出資料| Generate[generateResult]
-    Generate --> Response[ResponseDto\nOutputDTO + MetaDto]
+    Generate --> Response[ResponseDto<br/>OutputDTO + MetaDto]
     Response --> Controller
     Controller --> Client
     CrossCutting[共用例外 / AOP 日誌] -.橫切處理.-> UseCase

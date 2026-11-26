@@ -17,7 +17,7 @@ sequenceDiagram
     Client->>Filter: HTTP request + request DIO
     Filter->>Controller: 已驗證身份上下文
     Controller->>Service: request(member, input)
-    Note over Service,Base: 用例 Service 繼承 generic BaseService
+    Note over Service,Base: 用例 Service 繼承 BaseService
     Service->>Base: 呼叫繼承的 request()
     Base->>Process: 執行 processData(member, input)
     Process->>Worker: 依用例協調驗證／工作元件

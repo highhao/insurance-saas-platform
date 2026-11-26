@@ -6,12 +6,17 @@
 
 ```mermaid
 flowchart TB
-    Start[準備投保資料] --> Kind{選擇險種}
-    Kind --> Car[車險資料與報價]
-    Kind --> Travel[旅遊資料、方案比較與報價]
-    Car --> Create[建立投保訂單]
-    Travel --> Create
-    Create --> Manage[依狀態更新資料、送出、簽署或付款]
+    Start[選擇險種]
+    Start --> Car[車險]
+    Car --> CarData[車輛資料與問答]
+    CarData --> CarQuote[車險報價]
+    CarQuote --> CarOrder[建立車險訂單]
+    Start --> Travel[旅平險]
+    Travel --> TravelData[旅遊資料]
+    TravelData --> TravelQuote[方案比較與報價]
+    TravelQuote --> TravelOrder[建立旅平險訂單]
+    CarOrder --> Manage[訂單後續操作<br/>依狀態更新、送出、簽署或付款]
+    TravelOrder --> Manage
     Manage --> Query[查詢訂單狀態]
 ```
 

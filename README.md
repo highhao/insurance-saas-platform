@@ -29,7 +29,6 @@
 
 - Controller 接收 DIO 與已驗證的使用者資訊；Service 繼承 `BaseService` 共用請求流程。
 - 各用例的 Worker 與資料存取方式不同；部分 Service 直接使用 Mapper 或 Repository。
-- 車險入口：`CarInsuranceController`；旅平險入口：`TravelController`。
 
 ## 設計考量
 
@@ -38,7 +37,7 @@
 - **按險種分開 API 入口：** `CarInsuranceController` 與 `TravelController` 各自承接端點，再交給對應用例 Service，讓車險與旅平險的輸入和協作依賴保持在各自範圍。
 - **抽出共用請求生命週期：** 用例 Service 繼承 `BaseService`。基底類別統一呼叫 `processData()`、處理共通例外流程，再呼叫 `generateResult()`；各用例只實作自己的處理與回應組裝。
 - **依用例選擇協作者：** Service 會依需求使用 Worker，也有直接依賴 Mapper 或 Repository 的案例。因此實際結構不是固定的 Service → Worker → DAO 直線；這保留了用例彈性，但各 Service 的資料存取邊界並非完全一致。
-- **分開 API 契約與身份上下文：** Controller 以 DIO 接收輸入，透過已驗證的使用者上下文呼叫 Service，回應再以 DTO／`ResponseDto` 組裝。
+
 ## 技術
 
 - **語言與框架：** Java 11、Spring Boot 2.7.8、Spring Web

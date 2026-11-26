@@ -30,7 +30,7 @@
 flowchart TB
     Client[HTTP Client] --> Security[Spring Security / JWT Filter]
     Security --> Controller[Controller<br/>DIO + AuthenticatedMember]
-    Controller -->|service.request(member, input)| UseCase[具體用例 Service<br/>extends BaseService]
+    Controller -->|呼叫用例 request| UseCase[具體用例 Service<br/>extends BaseService]
     UseCase -->|BaseService 呼叫覆寫方法| Process[processData]
     Process -->|依用例協調| Workers[Worker 元件<br/>驗證 / 流程協調 / 通知]
     Process -.部分 Service 直接使用.-> DataAccess[Repository / Mapper]

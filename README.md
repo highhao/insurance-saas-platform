@@ -1,45 +1,43 @@
 # 產險後端 API：車險與旅平險
 
-依實際程式整理車險與旅平險 API 的投保流程與後端分層；不公開承保、計價等業務規則。
+依實際 Controller 與 Service 整理兩種險種的投保步驟及 API 分層；不公開承保、計價等業務規則。
 
 ## 投保流程
 
-```mermaid
-flowchart TB
-    Start[選擇險種]
-    Start --> Car[車險]
-    Car --> CarData[車輛資料與問答]
-    CarData --> CarQuote[車險報價]
-    CarQuote --> CarOrder[建立車險訂單]
-    Start --> Travel[旅平險]
-    Travel --> TravelData[旅遊資料]
-    TravelData --> TravelQuote[方案比較與報價]
-    TravelQuote --> TravelOrder[建立旅平險訂單]
-    CarOrder --> Manage[訂單後續操作<br/>依狀態更新、送出、簽署或付款]
-    TravelOrder --> Manage
-    Manage --> Query[查詢訂單狀態]
-```
+### 車險
 
-圖中步驟對應程式提供的 API 能力；各操作是獨立端點，實際順序依險種與訂單狀態而定。
+1. 查詢或填寫車輛資料。
+2. 依投保路徑填寫車況問答，或直接查詢報價。
+3. 查看報價與方案，選擇投保內容。
+4. 建立訂單。
+5. 視需要更新投保日期、車輛、要保人、被保險人或方案資料。
+6. 依訂單狀態送出、簽署或付款，並查詢訂單狀態。
 
-## 後端請求與分層
+### 旅平險
 
-`HTTP Request → Security Filter → Controller → BaseService.request() → processData() → generateResult() → ResponseDto`
+1. 填寫旅遊資料。
+2. 查詢並比較方案，再取得所選方案報價。
+3. 建立訂單。
+4. 視需要更新旅客及訂單資料。
+5. 依訂單狀態送出、簽署或付款，並查詢訂單狀態。
 
-- Controller 接收 DIO 與已驗證的使用者資訊。
-- 用例 Service 繼承 `BaseService`；`processData()` 依端點協調 Worker，部分用例直接使用 Mapper 或 Repository。
-- `generateResult()` 組裝共用回應；輸入與輸出分別使用 DIO、DTO。
+以上依 Controller 提供的 API 功能排序；各項操作是不同端點，實際順序會依險種及訂單狀態調整。流程不包含前端元件。
 
-車險入口是 `CarInsuranceController`，旅平險入口是 `TravelController`。類別名稱作為程式碼對照，流程圖只呈現面試官需要理解的步驟。
+## API 分層
 
-## 技術堆疊
+`Security Filter → Controller → BaseService.request() → processData() → Worker 和／或 Mapper、Repository → generateResult() → ResponseDto`
 
-| 分類 | 技術 |
-|---|---|
-| 語言與框架 | Java 11、Spring Boot 2.7.8、Spring Web |
-| API 與驗證 | Spring Security、JWT、Bean Validation、Swagger/OpenAPI |
-| 資料存取 | PostgreSQL、Spring Data JPA、JDBC、MyBatis |
-| 背景與整合 | Spring Batch、排程、WebService、Google Cloud Storage |
-| 監控與建置 | Spring Boot Actuator、Maven |
+- Controller 接收 DIO 與已驗證的使用者資訊；Service 繼承 `BaseService` 共用請求流程。
+- 各用例的 Worker 與資料存取方式不同；部分 Service 直接使用 Mapper 或 Repository。
+- 車險入口：`CarInsuranceController`；旅平險入口：`TravelController`。
 
-English: A code-based overview of car and travel insurance API flows, layers, and technologies.
+## 技術
+
+- **語言與框架：** Java 11、Spring Boot 2.7.8、Spring Web
+- **API 與驗證：** Spring Security、JWT、Bean Validation、Swagger/OpenAPI
+- **資料與整合：** PostgreSQL、JPA、JDBC、MyBatis、Spring Batch、WebService、Google Cloud Storage
+- **維運：** 排程、Spring Boot Actuator、Maven
+
+## English
+
+A code-based overview of car and travel insurance API flows and backend layers.

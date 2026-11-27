@@ -119,3 +119,7 @@ Cloudflare 作為外部入口；後端服務與 GitLab 部署於 GCP VM，由 Gi
 ## 分層說明
 
 [查看報價流程的程式分層](architecture-demo.md)
+
+## 架構 demo
+
+[查看可執行的分層示範](demo/)

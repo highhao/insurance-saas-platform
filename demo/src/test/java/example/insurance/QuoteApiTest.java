@@ -25,4 +25,13 @@ class QuoteApiTest {
         mvc.perform(post("/demo/quotes/car").contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"\"}"))
            .andExpect(status().isBadRequest());
     }
+    @Test void mockApplicationShowsDifferentOutcomes() throws Exception {
+        String json = "{\"category\":\"car\",\"plan\":\"A\",\"scenario\":\"history\",\"outcome\":\"failure\"}";
+        mvc.perform(post("/demo/application/reprice").contentType(MediaType.APPLICATION_JSON).content(json))
+           .andExpect(status().isOk()).andExpect(jsonPath("$.data.sampleAmount").value(1500));
+        mvc.perform(post("/demo/application/submit").contentType(MediaType.APPLICATION_JSON).content(json))
+           .andExpect(status().isOk()).andExpect(jsonPath("$.data.status").value("模擬未完成"));
+        mvc.perform(post("/demo/application/submit").contentType(MediaType.APPLICATION_JSON).content("{}"))
+           .andExpect(status().isBadRequest());
+    }
 }

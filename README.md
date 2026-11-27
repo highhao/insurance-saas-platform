@@ -18,7 +18,7 @@ flowchart TB
     D --> E[填寫要保人與被保險人資料]
     E --> F[依被保險人資料及出險紀錄取得實際報價]
     F --> G[確認險種與保費]
-    G --> H[送件並依方案完成付款]
+    G --> H[依商品流程完成付款與送件]
     H --> I{保險公司處理結果}
     I -->|成功| J[完成投保]
     I -->|失敗或退件| K[投保未完成]
@@ -38,8 +38,8 @@ flowchart TB
     B --> C[查詢並比較符合條件的方案]
     C --> D[選擇方案並取得報價]
     D --> E[填寫旅客及投保資料]
-    E --> F[建立投保單並依路徑送件]
-    F --> G[依方案完成付款或簽署]
+    E --> F[建立投保單]
+    F --> G[依商品流程完成付款與送件]
     G --> H{保險公司處理結果}
     H -->|成功| I[完成投保]
     H -->|失敗或退件| J[投保未完成]
@@ -49,7 +49,7 @@ flowchart TB
 
 ### 訂單狀態與例外處理
 
-車險與旅平險使用訂單狀態記錄處理進度。下表整理程式中可見的主要狀態；實際經過的狀態依保險公司及投保路徑而異。
+車險與旅平險使用訂單狀態記錄處理進度。下表是程式中的狀態範例；實際經過的狀態依保險公司及投保路徑而異。
 
 | 階段 | 狀態範例 | 用途 |
 | --- | --- | --- |
@@ -57,7 +57,7 @@ flowchart TB
 | 付款 | 待付款、已付款 | 記錄付款進度 |
 | 送件 | 已送交保險公司 | 記錄送件進度 |
 | 結果 | 完成、取消 | 記錄訂單處理結果 |
-| 異常 | 付款失敗、送件失敗、審核失敗、退件 | 區分不同處理結果 |
+| 異常 | 付款失敗 | 記錄付款處理結果 |
 
 車險付款處理可記錄付款失敗；旅平險送件發生例外時會回傳錯誤資訊。車險送件也會檢查訂單是否已送交或完成，避免重複送件。各保險公司的錯誤處理與狀態轉換依實際介接流程而異。
 
@@ -68,16 +68,19 @@ flowchart TB
 ## 系統架構
 
 ```mermaid
-flowchart TB
-    User[使用者] --> Edge[Cloudflare]
-    Edge --> Insurance
-    subgraph Cloud["GCP VM"]
-        Insurance[Insurance API<br/>車險與旅平險]
-    end
-    Insurance --> Provider[外部保險公司 API]
+flowchart LR
+    Insurance[Insurance API<br/>車險與旅平險]
+    Member[Member API<br/>會員資料]
+    SSO[SSO<br/>身分與權限]
+    Order[Order API<br/>訂單相關服務]
+    Provider[保險公司 API]
+    Insurance --> Member
+    Insurance --> SSO
+    Insurance --> Order
+    Insurance --> Provider
 ```
 
-Insurance、Member、Order、SSO 等服務與 GitLab 部署於 GCP VM；GitLab CI/CD 負責建置與部署。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
+圖中呈現 Insurance API 在不同用例中對其他服務的呼叫，並非每次請求都會經過所有服務。Cloudflare 作為外部入口；Insurance、Member、Order、SSO 等服務與 GitLab 部署於 GCP VM；GitLab CI/CD 負責建置與部署。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
 
 ### 服務職責
 

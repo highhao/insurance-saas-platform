@@ -4,10 +4,10 @@
 
 ```mermaid
 flowchart TB
-    C[Controller：接收請求] -->|呼叫 request| B[BaseService：共用處理流程]
-    B -->|呼叫 processData| S[個別 Service：用例處理]
-    S --> W[Worker：執行對應處理]
-    B -->|呼叫 generateResult| R[回應資料]
+    C[Controller 接收請求] --> B[Service.request]
+    B --> P[processData 處理用例]
+    P --> R[generateResult 組成回應]
+    P -. 呼叫 .-> W[Worker 執行對應工作]
 ```
 
 ## 請求處理
@@ -18,13 +18,5 @@ flowchart TB
 - 車險與旅平險的報價 Service 呼叫各自的 Worker，處理各用例所需的工作。
 - `Dio` 作為這些 Service 的輸入型別，`Dto` 作為處理結果，`ResponseDto` 包裝回應。
 
-```text
-Controller
-  └─ Service.request(使用者, 輸入)
-       1. processData(使用者, 輸入)
-          └─ 依用例呼叫 Worker，取得處理結果
-       2. generateResult(使用者, 處理結果, 開始時間)
-          └─ 組成 ResponseDto
-```
 
 處理過程如發生例外，會依錯誤類型處理或拋出，未必進入結果組裝；不同用例依需要使用 Worker、Mapper、Repository 或外部服務。

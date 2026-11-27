@@ -44,11 +44,38 @@ flowchart TB
 
 GitLab 與服務部署於 GCP VM。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
 
-- **服務分工：**Insurance 負責險種用例；Member、Order、SSO 分別處理會員、訂單及身分與權限，其他服務支援簽署、文件及通知。
-- **服務內分層：**Controller 接收操作；Service 編排用例；Worker／WebService 處理外部通訊；Mapper／Repository 存取資料；DTO 定義資料邊界。
-- **資料庫：**以 Flyway 管理版本化資料庫變更。
-- **技術：**Java、Spring Boot、PostgreSQL、JPA、JDBC、MyBatis、Flyway、Docker、GitLab CI/CD。
+### 服務職責
+
+| 服務 | 主要責任 |
+| --- | --- |
+| Insurance | 車險與旅平險投保用例 |
+| Member | 會員與相關資料 |
+| Order | 投保訂單 |
+| SSO | 身分驗證與權限 |
+| 其他服務 | 簽署、文件與通知 |
+
+### 程式分層
+
+| 層級 | 主要責任 |
+| --- | --- |
+| Controller | 接收操作並回傳結果 |
+| Service | 編排投保用例 |
+| Worker／WebService | 處理外部服務通訊 |
+| Mapper／Repository | 存取資料 |
+| DTO | 定義請求與回應的資料邊界 |
+
+### 技術
+
+- **後端與 API：**Java、Spring Boot
+- **資料與遷移：**PostgreSQL、JPA、JDBC、MyBatis、Flyway
+- **建置與部署：**Docker、GitLab CI/CD
+
+資料庫結構變更透過 Flyway 版本化管理。
 
 ## 設計考量
 
 依不同保險公司的規格處理資料轉換與外部回應，讓險種流程能與各家服務銜接；新增租戶及會員資料時，配合服務職責調整相關資料結構與 API。
+
+## 分層範例
+
+[查看元件職責與程式分層示意](architecture-demo.md)

@@ -12,9 +12,14 @@ class QuoteApiTest {
     @Autowired MockMvc mvc;
     @Test void carAndTravelReturnMockResult() throws Exception {
         for (String kind : new String[]{"car", "travel"}) {
-            mvc.perform(post("/demo/quotes/" + kind).contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"demo\"}"))
-               .andExpect(status().isOk()).andExpect(jsonPath("$.data.category").value(kind));
+            String reference = kind.equals("car") ? "demo-sedan" : "demo-trip";
+            mvc.perform(post("/demo/quotes/" + kind).contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"" + reference + "\"}"))
+               .andExpect(status().isOk()).andExpect(jsonPath("$.data.category").value(kind)).andExpect(jsonPath("$.data.plans.length()").value(2));
         }
+    }
+    @Test void incompatibleDemoConditionIsRejected() throws Exception {
+        mvc.perform(post("/demo/quotes/car").contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"demo-trip\"}"))
+           .andExpect(status().isBadRequest());
     }
     @Test void blankInputIsRejected() throws Exception {
         mvc.perform(post("/demo/quotes/car").contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"\"}"))

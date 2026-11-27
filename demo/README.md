@@ -16,10 +16,12 @@
 mvn spring-boot:run
 ```
 
-以另一個終端送出虛構請求：
+啟動後開啟 `http://localhost:8080/`，可選擇車險或旅平險，查看虛構條件檢核與模擬方案。
+
+也可在另一個終端送出虛構請求：
 
 ```bash
-curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application/json" -d '{"reference":"demo"}'
+curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application/json" -d '{"reference":"demo-sedan"}'
 ```
 
-旅平險端點為 `/demo/quotes/travel`。執行 `mvn test` 可檢查兩條端點與輸入驗證。
+旅平險端點為 `/demo/quotes/travel`，示範條件為 `demo-trip`。執行 `mvn test` 可檢查兩條端點與輸入驗證。

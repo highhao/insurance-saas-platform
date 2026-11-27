@@ -1,49 +1,28 @@
-# 產險 API｜分層範例
+# 產險 API｜實際程式分層
 
-以下以虛構資料重新整理實際專案中的分層概念，供閱讀架構使用；流程與類別名稱經簡化。
+以下依 Insurance 模組的車險與旅平險程式整理，名稱簡化以保護專案資訊。這是架構說明，並非可執行範例。
+
+```mermaid
+flowchart TB
+    C[Controller：接收請求] --> S[個別 Service：處理用例]
+    S --> B[共用 BaseService：處理流程與回應]
+    S --> W[Worker：執行對應處理]
+    W --> X[外部服務或資料存取]
+```
+
+## 程式中確認到的關係
+
+- 車險與旅平險 Controller 按操作呼叫對應 Service 的 `request`，傳入使用者與輸入資料。
+- 受檢查的車險報價及旅平險報價 Service 繼承 `BaseService`，分別實作 `processData` 和 `generateResult`。
+- 共用 `request` 在處理流程中呼叫這兩個方法，並處理例外及回應。
+- 受檢查的兩個報價 Service 分別呼叫各自的 Worker；Worker 的責任依用例不同，不能一概描述為外部 API 介面。
+- `Dio` 作為這些 Service 的輸入型別，`Dto` 作為處理結果，`ResponseDto` 包裝回應。
 
 ```text
-Controller → Service → Worker／WebService → 外部系統
-                    └→ Mapper／Repository → 資料庫
-         DTO 定義請求與回應邊界
+Controller
+  └─ service.request(使用者, 輸入)
+       ├─ processData(使用者, 輸入) → 對應 Worker
+       └─ generateResult(使用者, 處理結果, 開始時間) → ResponseDto
 ```
 
-- **Controller** 接收請求並交由 Service 處理。
-- **Service** 編排用例；共用基底將處理與結果轉換拆成擴充點。
-- **Worker／WebService** 封裝外部通訊；**Mapper／Repository** 負責資料讀寫。
-- **DTO** 承載跨層資料，避免將外部格式直接擴散到入口。
-
-```java
-// 簡化示意：方法與資料類型均為虛構
-class QuoteController {
-    private final QuoteService service;
-
-    QuoteResponse quote(QuoteRequest request) {
-        return service.execute(request);
-    }
-}
-
-abstract class BaseService<I, D, O> {
-    final O execute(I input) {
-        D data = process(input);
-        return toResponse(data);
-    }
-
-    protected abstract D process(I input);
-    protected abstract O toResponse(D data);
-}
-
-class QuoteService extends BaseService<QuoteRequest, QuoteData, QuoteResponse> {
-    private final ProviderGateway provider;
-
-    protected QuoteData process(QuoteRequest request) {
-        return provider.fetch(request);
-    }
-
-    protected QuoteResponse toResponse(QuoteData data) {
-        return QuoteResponse.from(data);
-    }
-}
-```
-
-此片段展示職責與依賴方向，省略建構子、型別定義及系統設定，並非可執行範例。實際系統會依用例使用不同服務與資料存取方式。
+此圖描述已檢查的報價路徑；不同用例可能使用不同 Worker、Mapper、Repository 或外部服務，不能推定所有請求都經過相同元件。

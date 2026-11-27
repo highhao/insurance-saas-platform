@@ -20,9 +20,11 @@ flowchart TB
 
 ```text
 Controller
-  └─ service.request(使用者, 輸入)
-       ├─ processData(使用者, 輸入) → 對應 Worker
-       └─ generateResult(使用者, 處理結果, 開始時間) → ResponseDto
+  └─ Service.request(使用者, 輸入)
+       1. processData(使用者, 輸入)
+          └─ 依用例呼叫 Worker，取得處理結果
+       2. generateResult(使用者, 處理結果, 開始時間)
+          └─ 組成 ResponseDto
 ```
 
-不同用例依需要使用 Worker、Mapper、Repository 或外部服務。
+處理過程如發生例外，會依錯誤類型處理或拋出，未必進入結果組裝；不同用例依需要使用 Worker、Mapper、Repository 或外部服務。

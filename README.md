@@ -50,19 +50,14 @@ flowchart TB
 ```mermaid
 flowchart TB
     User[使用者] --> Edge[Cloudflare]
+    Edge --> Insurance
     subgraph Cloud["GCP VM"]
         Insurance[Insurance API<br/>車險與旅平險]
-        Other[其他服務<br/>Member、Order、SSO 等]
-        GitLab[GitLab<br/>程式碼與 CI/CD]
-        GitLab -. 建置與部署 .-> Insurance
-        GitLab -. 建置與部署 .-> Other
     end
-    Edge --> Insurance
-    Edge --> Other
     Insurance --> Provider[外部保險公司 API]
 ```
 
-GitLab 與服務部署於 GCP VM。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
+Insurance、Member、Order、SSO 等服務與 GitLab 部署於 GCP VM；GitLab CI/CD 負責建置與部署。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
 
 ### 服務職責
 

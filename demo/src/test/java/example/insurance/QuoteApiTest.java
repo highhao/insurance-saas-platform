@@ -12,8 +12,10 @@ class QuoteApiTest {
     @Autowired MockMvc mvc;
     @Test void carAndTravelReturnMockResult() throws Exception {
         for (String kind : new String[]{"car", "travel"}) {
-            String reference = kind.equals("car") ? "demo-sedan" : "demo-trip";
-            mvc.perform(post("/demo/quotes/" + kind).contentType(MediaType.APPLICATION_JSON).content("{\"reference\":\"" + reference + "\"}"))
+            String body = kind.equals("car")
+                ? "{\"reference\":\"demo-sedan\",\"vehicleType\":\"sedan\",\"vehicleYear\":2020}"
+                : "{\"reference\":\"demo-trip\",\"country\":\"JP\",\"departureDate\":\"2027-05-01\",\"returnDate\":\"2027-05-05\"}";
+            mvc.perform(post("/demo/quotes/" + kind).contentType(MediaType.APPLICATION_JSON).content(body))
                .andExpect(status().isOk()).andExpect(jsonPath("$.data.category").value(kind)).andExpect(jsonPath("$.data.plans.length()").value(2));
         }
     }

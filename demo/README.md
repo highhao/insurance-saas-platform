@@ -21,10 +21,10 @@ mvn spring-boot:run
 也可在另一個終端送出虛構請求：
 
 ```bash
-curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application/json" -d '{"reference":"demo-sedan"}'
+curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application/json" -d '{"reference":"demo-sedan","vehicleType":"sedan","vehicleYear":2020}'
 ```
 
-旅平險端點為 `/demo/quotes/travel`，示範條件為 `demo-trip`。執行 `mvn test` 可檢查兩條端點與輸入驗證。
+旅平險端點為 `/demo/quotes/travel`，示範 request 可使用 `{"reference":"demo-trip","country":"JP","departureDate":"2027-05-01","returnDate":"2027-05-05"}`。執行 `mvn test` 可檢查兩條端點與輸入驗證。
 
 ## Request／Response 範例
 
@@ -35,7 +35,7 @@ curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application
 `POST /demo/quotes/car`
 
 ```json
-{ "reference": "demo-sedan" }
+{ "reference": "demo-sedan", "vehicleType": "sedan", "vehicleYear": 2020 }
 ```
 
 ```json

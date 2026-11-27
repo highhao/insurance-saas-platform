@@ -28,7 +28,7 @@ flowchart TB
 - **實際報價：**選定方案並補齊資料後，依被保險人及出險等資料重新取得實際價格。
 - **線上投保：**要保人與被保險人相同，由客戶進行線上投保。
 
-預估查價、實際報價及投保送件依方案串接對應保險公司；實際流程與簽署、付款方式依商品及保險公司而異。
+預估查價、實際報價及投保送件依方案串接對應保險公司；付款與送件順序依商品及保險公司而異。
 
 ### 旅平險
 
@@ -80,7 +80,7 @@ flowchart LR
     Insurance --> Provider
 ```
 
-圖中呈現 Insurance API 在不同用例中對其他服務的呼叫，並非每次請求都會經過所有服務。Cloudflare 作為外部入口；Insurance、Member、Order、SSO 等服務與 GitLab 部署於 GCP VM；GitLab CI/CD 負責建置與部署。初期集中部署以控制成本；服務按責任拆分，多數具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
+圖中呈現 Insurance API 在不同用例中對其他服務的呼叫，並非每次請求都會經過所有服務。Cloudflare 作為外部入口；Insurance、Member、Order、SSO 等服務與 GitLab 部署於 GCP VM，由 GitLab CI/CD 負責建置與部署。初期集中部署以控制成本，多數服務具獨立建置設定與 Dockerfile，為後續調整部署方式保留空間。
 
 ### 服務職責
 

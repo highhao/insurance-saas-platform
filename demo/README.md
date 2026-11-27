@@ -62,7 +62,14 @@ curl -X POST http://localhost:8080/demo/quotes/car -H "Content-Type: application
 
 ```json
 {
-  "data": { "status": "模擬完成", "message": "示範結果；未連接保險公司、金流或資料庫" },
+  "data": {
+    "status": "模擬完成",
+    "message": "示範投保已完成",
+    "demoReference": "DEMO-12345678",
+    "category": "car",
+    "plan": "A",
+    "sampleAmount": 1000
+  },
   "startedAt": "2026-01-01T00:00:00Z"
 }
 ```

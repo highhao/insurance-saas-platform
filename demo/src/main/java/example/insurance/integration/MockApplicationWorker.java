@@ -2,6 +2,7 @@ package example.insurance.integration;
 import example.insurance.api.dto.ApplicationDio;
 import example.insurance.domain.ApplicationStatus;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 @Component
 public class MockApplicationWorker {
@@ -11,7 +12,14 @@ public class MockApplicationWorker {
         return Map.of("category", input.getCategory(), "plan", input.getPlan(), "sampleAmount", sample, "label", "虛構示範金額");
     }
     public Map<String, Object> submit(ApplicationDio input) {
-        return Map.of("status", input.getOutcome().equals("success") ? ApplicationStatus.COMPLETED : ApplicationStatus.NOT_COMPLETED,
-                      "message", "示範結果；未連接保險公司、金流或資料庫");
+        boolean success = input.getOutcome().equals("success");
+        return Map.of(
+            "status", success ? ApplicationStatus.COMPLETED : ApplicationStatus.NOT_COMPLETED,
+            "message", success ? "示範投保已完成" : "示範送件未通過",
+            "demoReference", "DEMO-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
+            "category", input.getCategory(),
+            "plan", input.getPlan(),
+            "sampleAmount", input.getScenario().equals("history") ? 1500 : 1000
+        );
     }
 }
